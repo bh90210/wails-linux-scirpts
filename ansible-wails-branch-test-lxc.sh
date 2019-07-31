@@ -1,147 +1,92 @@
 #!/bin/bash
 
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+GIT=$1
+BRANCH=$2
+
+sudo lxc start wails-centos-test
+sudo lxc start wails-fedora-test
+sudo lxc start wails-archlinux-test
+sudo lxc start wails-debian-test
+sleep 4
+
 # functions
 # fedora30
 fedora30(){
-    echo -e "starting fedora 30 lxc"
-    sudo lxc start wails-fedora-test
-    echo -e "exec in the bin/bash of the container"
-    sudo lxc exec wails-fedora-test  -- /bin/bash
-    
-    initTestingWailsSetup
-    
-    echo -e "is wails init & wails build -d enough? (y/n)"
-    read input
-    if [ $input = "y" ]
-    then
-        buildWails
-    elif [ $input = "n" ]
-    then
-        enterCommand
-    fi
-}
-
-# centos7
-centos7(){
-    echo -e "starting centos 7 lxc"
-    sudo lxc start wails-centos-test
-    
-    initTestingWailsSetup $1 $2
-
-    echo -e "is wails init & wails build -d enough? (y/n)"
-    read input
-    if [ $input = "y" ]
-    then
-        buildWails
-    elif [ $input = "n" ]
-    then
-        enterCommand
-    fi
+    runFunction "wails-fedora-test"
 }
 
 # debian9
 debian9() {
-    echo -e "starting debian 9 lxc"
-    sudo lxc start wails-debian-test
-    echo -e "exec in the bin/bash of the container"
-    sudo lxc exec wails-debian-test  -- /bin/bash
-    
-    initTestingWailsSetup
-    
-    echo -e "is wails init & wails build -d enough? (y/n)"
-    read input
-    if [ $input = "y" ]
-    then
-        buildWails
-    elif [ $input = "n" ]
-    then
-        enterCommand
-    fi
+    runFunction "wails-debian-test"
 }
 
 # archlinux
 archlinux(){
-    echo -e "starting archlinux lxc"
-    sudo lxc start wails-archlinux-test
-    echo -e "exec in the bin/bash of the container"
-    sudo lxc exec wails-archlinux-test  -- /bin/bash
-    
-    initTestingWailsSetup
-    
-    echo -e "is wails init & wails build -d enough? (y/n)"
-    read input
-    if [ $input = "y" ]
-    then
-        buildWails
-    elif [ $input = "n" ]
-    then
-        enterCommand
-    fi
+    runFunction "wails-archlinux-test"
 }
 
-initTestingWailsSetup() {
+
+# centos7
+centos7(){
+    runFunction "wails-centos-test"
+}
+
+runFunction(){
+    local DISTRO=$1
     echo -e "replacing previous wails installation with specified git/branch"
+    sudo lxc exec ${DISTRO} -- rm /root/go/bin/wails
+    sudo lxc exec ${DISTRO} -- rm -r /root/wails
+    #sudo lxc exec ${DISTRO} -- git clone -b ${BRANCH} ${GIT} /root/wails
+    #echo -e "${RED}cd /root/wails/cmd/wails && go install && cd ~ && rm -r dp && wails init && cd dp && wails build -d${NC}"
+    # sudo lxc exec ${DISTRO} -- /bin/bash
 
-    sudo lxc exec wails-centos-test  -- rm /root/go/bin/wails && rm -rf /root/wails && cd /root/ && git clone $1 && cd /root/wails && git branch $2 && git checkout $2 && cd /root/wails/cmd/wails && go install
+    #sudo lxc exec wails-centos-test -- sh -c "rm /root/go/bin/wails && rm -r /root/wails && git clone -b ${BRANCH} ${GIT} /root/wails | cd /root/wails/cmd/wails | go install && cd ~ && /root/go/bin/wails init"
+    sudo lxc exec ${DISTRO} -- sh -c "git clone -b ${BRANCH} ${GIT} /root/wails && cd wails/cmd/wails && export PATH=$PATH:/usr/local/go/bin && go install"
+    echo -e "wails brnach ${BRANCH} from  ${GIT} was go installed succesfully"
+    echo -e "init & build wails project (1) or bash in to conainer (2)?"
+    read input
+    if [ $input="1" ]
+    then
+        sudo lxc exec ${DISTRO} -- sh -c "cd ~ && rm -r project && wails init && wails build -d"
+    elif
+    then
+        sudo lxc exec ${DISTRO} -- /bin/bash
+    fi
+
 }
-
-buildWails(){
-    sudo lxc exec wails-centos-test  -- rm -rf /root/default-project && cd /root && wails init && wails build -d
-}
-
-enterCommand(){
-    while true
-    do
-        echo -e "enter command to run (remeber it has to be with full paths and one liner)"
-        read input
-        sudo lxc exec wails-centos-test  -- $input
-    done
-}
-
 # after testing part
 closing(){
     echo -e "stoping all containers"
-    sudo lxc stop wails-centos-test
-    sudo lxc stop wails-fedora-test
-    sudo lxc stop wails-archlinux-test
-    sudo lxc stop wails-debian-test
+    sudo lxc stop wails-centos-test && sudo lxc stop wails-fedora-test && sudo lxc stop wails-archlinux-test && sudo lxc stop wails-debian-test
 }
 
-#
-# // starting the script
-#
-echo -e "Starting the script"
-echo -e "enter https github link"
-read gitUrl
-echo -e "enter branch"
-read newBranch
-echo -e "enter either a name (ex. debian9,centos7,fedora30,archlinux) or all: "
-read input
-if [ $input = "all" ]
+if [ $3 = "all" ]
 then
-    debian9 $gitUrl $newBranch
-    centos7 $gitUrl $newBranch
-    fedora30 $gitUrl $newBranch
-    archlinux $gitUrl $newBranch
+    debian9
+    centos7
+    fedora30
+    archlinux
     closing
     
-elif [ $input = "debian9" ]
+elif [ $3 = "debian9" ]
 then
-    debian9 $gitUrl $newBranch
+    debian9
     closing
     
-elif [ $input = "centos7" ]
+elif [ $3 = "centos7" ]
 then
-    centos7 $gitUrl $newBranch
+    centos7
     closing
     
-elif [ $input = "fedora30" ]
+elif [ $3 = "fedora30" ]
 then
-    fedora30 $gitUrl $newBranch
+    fedora30
     closing
     
-elif [ $input = "archlinux" ]
+elif [ $3 = "archlinux" ]
 then
-    archlinux $gitUrl $newBranch
+    archlinux
     closing
 fi
