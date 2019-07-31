@@ -51,6 +51,7 @@ runFunction(){
         sudo lxc exec ${DISTRO} -- rm -r /root/project
         sudo lxc exec ${DISTRO} -- sh -c "cd ~ && export PATH=$PATH:/usr/local/go/bin:/root/go/bin && wails init"
         sudo lxc exec ${DISTRO} -- sh -c "export PATH=$PATH:/usr/local/go/bin:/root/go/bin  && cd /root/project && wails build -d"
+        sudo lxc exec ${DISTRO} -- /bin/bash
     else
         sudo lxc exec ${DISTRO} -- /bin/bash
     fi
