@@ -42,11 +42,6 @@ runFunction(){
     echo -e "replacing previous wails installation with specified git/branch"
     sudo lxc exec ${DISTRO} -- rm /root/go/bin/wails
     sudo lxc exec ${DISTRO} -- rm -r /root/wails
-    #sudo lxc exec ${DISTRO} -- git clone -b ${BRANCH} ${GIT} /root/wails
-    #echo -e "${RED}cd /root/wails/cmd/wails && go install && cd ~ && rm -r dp && wails init && cd dp && wails build -d${NC}"
-    # sudo lxc exec ${DISTRO} -- /bin/bash
-
-    #sudo lxc exec wails-centos-test -- sh -c "rm /root/go/bin/wails && rm -r /root/wails && git clone -b ${BRANCH} ${GIT} /root/wails | cd /root/wails/cmd/wails | go install && cd ~ && /root/go/bin/wails init"
     sudo lxc exec ${DISTRO} -- sh -c "git clone -b ${BRANCH} ${GIT} /root/wails && cd wails/cmd/wails && export PATH=$PATH:/usr/local/go/bin && go install"
     echo -e "wails branch ${BRANCH} from  ${GIT} was go installed succesfully"
     echo -e "init & build wails project? (Y) (anything else returns active container bash)"
