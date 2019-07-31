@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# how to use
+# ./ansible-wails-branch-test-lxc.sh https://github.com/bh90210/wails.git develop centos7
+#                                    git                                  branch  lxd os
+
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 GIT=$1
@@ -61,10 +65,10 @@ runFunction(){
 # after testing part
 closing(){
     echo -e "stoping all containers"
+    sudo lxc stop wails-debian-test
     sudo lxc stop wails-centos-test
     sudo lxc stop wails-fedora-test
     sudo lxc stop wails-archlinux-test
-    sudo lxc stop wails-debian-test
 }
 
 if [ $3 = "all" ]
