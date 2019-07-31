@@ -1,0 +1,32 @@
+---
+- hosts: local
+  connection: local
+  remote_user: root
+  become: yes
+  gather_facts: False
+  tasks:
+    - name: centos7 - start the container
+      command: lxc start wails-centos-test
+      ignore_errors: True
+      register: hello
+
+    - debug: msg="{{ hello.stdout }}"
+
+    - debug: msg="{{ hello.stderr }}"
+
+    - name: centos7 - bash to container
+      shell: lxc exec wails-centos-test -- /bin/bash
+      ignore_errors: True
+      register: hello
+    - debug: msg="{{ hello.stdout }}"
+
+    - debug: msg="{{ hello.stderr }}"
+
+    - name: centos7 - ls
+      shell: ls
+      ignore_errors: True
+      register: hello
+
+    - debug: msg="{{ hello.stdout }}"
+
+    - debug: msg="{{ hello.stderr }}"
