@@ -44,22 +44,26 @@ runFunction(){
 
     #sudo lxc exec wails-centos-test -- sh -c "rm /root/go/bin/wails && rm -r /root/wails && git clone -b ${BRANCH} ${GIT} /root/wails | cd /root/wails/cmd/wails | go install && cd ~ && /root/go/bin/wails init"
     sudo lxc exec ${DISTRO} -- sh -c "git clone -b ${BRANCH} ${GIT} /root/wails && cd wails/cmd/wails && export PATH=$PATH:/usr/local/go/bin && go install"
-    echo -e "wails brnach ${BRANCH} from  ${GIT} was go installed succesfully"
-    echo -e "init & build wails project (1) or bash in to conainer (2)?"
+    echo -e "wails branch ${BRANCH} from  ${GIT} was go installed succesfully"
+    echo -e "init & build wails project? (Y) (anything else returns active container bash)"
     read input
-    if [ $input="1" ]
-    then
-        sudo lxc exec ${DISTRO} -- sh -c "cd ~ && rm -r project && wails init && wails build -d"
-    elif
-    then
+    if [[ $input == "Y" || $input == "y" ]]; then
+        sudo lxc exec ${DISTRO} -- rm -r /root/project
+        sudo lxc exec ${DISTRO} -- sh -c "cd ~ && export PATH=$PATH:/usr/local/go/bin:/root/go/bin && wails init"
+        sudo lxc exec ${DISTRO} -- sh -c "export PATH=$PATH:/usr/local/go/bin:/root/go/bin  && cd /root/project && wails build -d"
+    else
         sudo lxc exec ${DISTRO} -- /bin/bash
     fi
+
 
 }
 # after testing part
 closing(){
     echo -e "stoping all containers"
-    sudo lxc stop wails-centos-test && sudo lxc stop wails-fedora-test && sudo lxc stop wails-archlinux-test && sudo lxc stop wails-debian-test
+    sudo lxc stop wails-centos-test
+    sudo lxc stop wails-fedora-test
+    sudo lxc stop wails-archlinux-test
+    sudo lxc stop wails-debian-test
 }
 
 if [ $3 = "all" ]
