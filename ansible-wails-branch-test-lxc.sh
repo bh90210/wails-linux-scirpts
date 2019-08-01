@@ -9,32 +9,58 @@ NC='\033[0m' # No Color
 GIT=$1
 BRANCH=$2
 
-sudo lxc start wails-centos-test
-sudo lxc start wails-fedora-test
-sudo lxc start wails-archlinux-test
-sudo lxc start wails-debian-test
-sleep 4
-
 # functions
 # fedora30
 fedora30(){
+    echo -e "starting fedora30 container"
+    sudo lxc start wails-fedora-test
+    sleep 2
+
     runFunction "wails-fedora-test"
+
+    echo -e "stoping fedora30 container"
+    sudo lxc stop wails-fedora-test
+    sleep 2
 }
 
 # debian9
 debian9() {
+    echo -e "starting debian9 container"
+    sudo lxc start wails-debian-test
+    sleep 2
+
     runFunction "wails-debian-test"
+
+    echo -e "stoping debian9 container"
+    sudo lxc stop wails-debian-test
+    sleep 2
 }
 
 # archlinux
 archlinux(){
+    echo -e "starting archlinux container"
+    sudo lxc start wails-archlinux-test
+    sleep 2
+
     runFunction "wails-archlinux-test"
+
+    echo -e "stoping archlinux container"
+    sudo lxc stop wails-archlinux-test
+    sleep 2
 }
 
 
 # centos7
 centos7(){
+    echo -e "starting centos7 container"
+    sudo lxc start wails-centos-test
+    sleep 2
+
     runFunction "wails-centos-test"
+
+    echo -e "stoping centos7 container"
+    sudo lxc stop wails-centos-test
+    sleep 2
 }
 
 runFunction(){
@@ -54,16 +80,6 @@ runFunction(){
     else
         sudo lxc exec ${DISTRO} -- /bin/bash
     fi
-
-
-}
-# after testing part
-closing(){
-    echo -e "stoping all containers"
-    sudo lxc stop wails-debian-test
-    sudo lxc stop wails-centos-test
-    sudo lxc stop wails-fedora-test
-    sudo lxc stop wails-archlinux-test
 }
 
 if [ $3 = "all" ]
@@ -72,25 +88,16 @@ then
     centos7
     fedora30
     archlinux
-    closing
-    
 elif [ $3 = "debian9" ]
 then
     debian9
-    closing
-    
 elif [ $3 = "centos7" ]
 then
     centos7
-    closing
-    
 elif [ $3 = "fedora30" ]
 then
     fedora30
-    closing
-    
 elif [ $3 = "archlinux" ]
 then
     archlinux
-    closing
 fi
