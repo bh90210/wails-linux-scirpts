@@ -1,7 +1,6 @@
 ARG DISTRO
-FROM wail-$DISTRO
-ENV PATH=$PATH:/usr/local/go/bin:/root/go/bin
-VOLUME /wails
-ADD wails /wails
-ADD ./wails /
-ENTRYPOINT ["/bin/bash", "-c", "echo Hello, $name"]
+FROM wails-$DISTRO
+ENV PATH "$PATH:/usr/local/go/bin"
+ADD wails /usr/local/go/bin
+COPY source /wails
+ENTRYPOINT ["/bin/bash"]
