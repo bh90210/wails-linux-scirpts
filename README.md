@@ -11,9 +11,9 @@ a small go script for testing wails against supported Linux distributions
 `go run .`
 
 #### available commands
-1. test-branch $distro $git $branch (1) distribution to test on, git repo and specific branch to test against
-2. supported-distros (7) show all currently support distributions
-3. tester-prune (8) delete from host all wails built docker images
+* `test-branch (1)` it will promprt for distribution to test on, git repo and specific branch to test against
+* `supported-distros (7)` show a list of all currently support distributions
+* `tester-prune (8)` delete from host all wails built docker images
 
-4. exit (0) exit the tester
-5. help (9) (meta)
+* `exit (0)` exit the tester
+* `help (9)` (meta)
