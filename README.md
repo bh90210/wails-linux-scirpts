@@ -1,6 +1,6 @@
 # wails-linux-scripts v0.1-alpha
 
-a small go script for testing wails against supported Linux distributions
+a small go script for testing specific wails branches against supported Linux distributions
 
 ### use
 
