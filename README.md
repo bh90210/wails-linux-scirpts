@@ -13,7 +13,7 @@ a small go script for testing specific wails branches against supported Linux di
 #### available commands
 
 * `test-branch (1)` it will promprt for distribution to test on, git repo and specific branch to test against
-* `supported-distros (7)` show a list of all currently support distributions
+* `supported-distros (7)` show a list of all currently supported distributions
 * `tester-prune (8)` delete from host all wails built docker images
 * `exit (0)` exit the tester
 * `help (9)` (meta)
