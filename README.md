@@ -1,15 +1,21 @@
-# wails-linux-scirpts
+# wails-linux-scripts v0.1-alpha
 
-various helpers for testing wails against supported distros 
+a small go script for testing wails against supported Linux distributions
 
-### instructions
-
-#### prerequisites: lxd installed on your machine
+### use
 
 `git clone https://github.com/bh90210/wails-linux-scirpts.git`
 
 `cd wails-linux-scirpts`
 
-`chmod +x *.sh`
+`go run .`
 
 `./script-name.sh`
+
+### available commands
+1. test-branch $distro $git $branch (1) distribution to test on, git repo and specific branch to test against
+2. supported-distros (7) show all currently support distributions
+3. tester-prune (8) delete from host all wails built docker images
+
+4. exit (0) exit the tester
+5. help (9) (meta)
