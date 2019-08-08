@@ -159,7 +159,7 @@ func goInstallWailsInit(distro, git, branch string) {
 		fmt.Println(b.Text())
 	}
 
-	// TODO: remove wails-test-latest docker image
+	// TODO: remove wails-test-latest docker images
 
 	// build selected distro test container and populate it with newly built 'wails' and './wails/wails.json'
 	//docker run -it --rm --name wails-debian9-test  --entrypoint "/bin/bash" wails-debian9
