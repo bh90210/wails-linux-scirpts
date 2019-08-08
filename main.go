@@ -130,8 +130,10 @@ func goInstallWailsInit(distro, git, branch string) {
 	fmt.Println(feedback)
 
 	// build 'git-branch' container to produce the test build
-	//cmd := "docker build -t wails-test-latest --build-arg GIT=https://github.com/wailsapp/wails.git --build-arg BRANCH=linux-db --no-cache ./git-branch"
-	cmd := "docker build -t wails-test-latest --build-arg GIT=" + git + " --build-arg BRANCH=" + branch + " ./git-branch"
+
+	// TODO: feat add --no-cache flag as option
+	cmd := "docker build -t wails-test-latest --build-arg GIT=" + git + " --build-arg BRANCH=" + branch + " --no-cache ./git-branch"
+	//cmd := "docker build -t wails-test-latest --build-arg GIT=" + git + " --build-arg BRANCH=" + branch + " ./git-branch"
 	out := exec.Command("bash", "-c", cmd)
 	out.Stdin = os.Stdin
 	stdout, _ := out.StdoutPipe()
