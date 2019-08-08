@@ -109,6 +109,7 @@ loop:
 			fmt.Println("wails-linux-scripts v0.1-alpha helpfile!")
 			fmt.Println("available commands:")
 			fmt.Println(" * test-branch $distro $git $branch (1) distribution, git repo and specific branch to test against")
+			fmt.Println(" * test-all (2) test (go install & wails init) of given git & branch against all supported distros (cpu intense!) NOTWORKINGYET")
 			fmt.Println(" * supported-distros (7) show all currently support distributions")
 			fmt.Println(" * tester-prune (8) delete from host all wails built docker images")
 			fmt.Println(" * exit (0) exit the tester")
@@ -195,11 +196,23 @@ func goInstallWailsInit(distro, git, branch string) {
 func checkDockerImageExist(distro string) string {
 	cmd := "docker images | grep -c wails-" + distro
 	out, _ := exec.Command("bash", "-c", cmd).Output()
-
-	if string(out) == "0" {
-		cmd := "docker build -t wails-" + distro + " /supported-distros/" + distro
-		out, _ := exec.Command("bash", "-c", cmd).Output()
-		fmt.Printf("%s\n", out)
+	string := string(out[:])
+	fmt.Printf("checking if %s is on host", distro)
+	if string == "0\n" {
+		fmt.Printf("image for %s doesn't exist, building now, this will take a while", distro)
+		cmd := "cd supported-distros/" + distro + " && docker build -t wails-" + distro + " ."
+		out := exec.Command("bash", "-c", cmd)
+		out.Stdin = os.Stdin
+		stdout, _ := out.StdoutPipe()
+		b := bufio.NewScanner(stdout)
+		err := out.Start()
+		if err != nil {
+			log.Println(err)
+		}
+		for b.Scan() {
+			//print the input
+			fmt.Println(b.Text())
+		}
 		return " >>> docker image was missing, but not anymore.."
 	}
 
