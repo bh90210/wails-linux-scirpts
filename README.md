@@ -12,13 +12,13 @@ a small go script for testing specific wails branches against supported Linux di
 
 #### available commands
 
-* `test-branch (1)` it will promprt for distribution to test on, git repo and specific branch to test against
-* `supported-distros (7)` show a list of all currently supported distributions
-* `tester-prune (8)` delete from host all wails built docker images
-* `exit (0)` exit the tester
-* `help (9)` (meta)
-
-`test-branch (1)` options
-- `go install && wails init (1)`
-- `go install && bin/bash /root (2) (opens a new terminal window)`
-- `go install && wails init && bin/bash /root (3) (opens a new terminal window)`
+```bash
+├── * `test-branch (1)` it will promprt for distribution, git repo and specific branch to test against
+│   ├── `go install && wails init (1)`
+│   ├── `go install && bin/bash /root (2) (opens a new terminal window)`
+│   └── `go install && wails init && bin/bash /root (3) (opens a new terminal window)`
+├── * `supported-distros (7)` show a list of all currently supported distributions
+├── * `tester-prune (8)` delete from host all wails built docker images
+├── * `exit (0)` exit the tester
+├── * `help (9)` (meta)
+```
