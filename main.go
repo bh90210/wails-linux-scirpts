@@ -65,8 +65,9 @@ loop:
 			//fmt.Printf("%s %s %s\n", distro, git, branch)
 
 			fmt.Println("go install && wails init (1)")
-			fmt.Println("go install && bin/bash /root (2)")
-			fmt.Println("go install && wails init && bin/bash /root (3)")
+			// TODO: fix the NOTWORKINGYET
+			fmt.Println("go install && bin/bash /root (2) NOTWORKINGYET")
+			fmt.Println("go install && wails init && bin/bash /root (3) NOTWORKINGYET")
 			scanner.Scan()
 			text := scanner.Text()
 			switch text {
@@ -130,7 +131,7 @@ func goInstallWailsInit(distro, git, branch string) {
 
 	// build 'git-branch' container to produce the test build
 	//cmd := "docker build -t wails-test-latest --build-arg GIT=https://github.com/wailsapp/wails.git --build-arg BRANCH=linux-db --no-cache ./git-branch"
-	cmd := "docker build -t wails-test-latest --build-arg GIT=https://github.com/wailsapp/wails.git --build-arg BRANCH=linux-db ./git-branch"
+	cmd := "docker build -t wails-test-latest --build-arg GIT=" + git + " --build-arg BRANCH=" + branch + " ./git-branch"
 	out := exec.Command("bash", "-c", cmd)
 	out.Stdin = os.Stdin
 	stdout, _ := out.StdoutPipe()
