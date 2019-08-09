@@ -19,7 +19,8 @@ a small go script for testing specific wails branches against supported Linux di
 │   ├── `go install && bin/bash /root`
 │   └── `go install && wails init && bin/bash /root`
 ├── * `all` test (go install & wails init) of given git & branch against all supported distros (cpu intense!)
-├── * `prune` delete all wails built docker images from host
+├── * `prune` delete wails built docker images from host (excluding distro builds)
+├── * `pruneall` delete wails built docker images from host (including distro builds)
 ├── * `exit`
 └── * `help` (meta)
 ```
