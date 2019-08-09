@@ -6,129 +6,228 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	// I used to hate netflix, now I kind of love them!
 	expect "github.com/Netflix/go-expect"
+	"github.com/abiosoft/ishell"
+	_ "github.com/fatih/color"
 )
 
 func main() {
-	cli()
+	shell()
 }
 
-func cli() {
-	// start a new keybard scanner
-	scanner := bufio.NewScanner(os.Stdin)
+func shell() {
+	// start a new shell
+	shell := ishell.New()
 
-	// and split input into words
-	// this is for multiple word input
-	// to be treated as flags of some sort
-	scanner.Split(bufio.ScanWords)
+	// display info.
+	shell.Println("τέστερ v0.2-alpha")
+	shell.Println("available commands:")
+	shell.Println(" * branch (1) | distribution, git repo and specific branch to test against")
+	shell.Println(" * all (2) | test (go install & wails init) of given git & branch against all supported distros (cpu intense!) NOTWORKINGYET")
+	//LABEL wails="remove"
+	shell.Println(" * prune (3) | delete wails built docker images from host (excluding distro builds)")
+	// LABEL wails="removeall"
+	shell.Println(" * prune-all (4) | delete wails built docker images from host (including distro builds) -- NOTWORKINGYET")
+	shell.Println("exit | exit τέστερ")
+	shell.Println("help | (meta)")
 
-	// helper viariable for the bellow switch
-	// default value is help meaning this is the
-	// landing case when cli starts
-	var input = "help"
-	// label for the 'for' loop
-	// this is done so we can escpate later using 'brake loop'
-loop:
-	for {
-		switch input {
-		// when user enters a value not declared in any 'case'
-		// app hangs. 'default' catches this and gracefully
-		// returns some help and puts user back in the 'for' loop
-		default:
-			fmt.Println("command does not exist!")
-			fmt.Println("if you need it type 'help'")
-			scanner.Scan()
-			text := scanner.Text()
-			input = text
-
-		case "test-branch", "1":
-			// show a list of all supported-distros
-			// because probably you don't remember it
+	shell.AddCmd(&ishell.Cmd{
+		Name:    "branch",
+		Aliases: []string{"1"},
+		Help:    "a) select distro, b) enter GIT and BRANCH to check against",
+		Func: func(c *ishell.Context) {
+			// cd in supported-distros directory and print in MultiChoice
 			cmd := "cd ./supported-distros && ls"
 			out, err := exec.Command("bash", "-c", cmd).Output()
 			if err != nil {
 				fmt.Sprintf("failed to execute command: %s", cmd)
 			}
-			fmt.Printf("%s", out)
+			//fmt.Printf("%s\n", out)
+			stringConvert := string(out)
+			distros := strings.Fields(stringConvert)
+			cliMultiChoiceList := []string{}
 
-			fmt.Printf(" - enter: 'distro git branch'\n")
-			// TODO: code cleanup
-			scanner.Scan()
-			distro := scanner.Text()
-			scanner.Scan()
-			git := scanner.Text()
-			scanner.Scan()
-			branch := scanner.Text()
-			//fmt.Printf("%s %s %s\n", distro, git, branch)
-
-			fmt.Println("go install && wails init (1)")
-			// TODO: fix the NOTWORKINGYET
-			fmt.Println("go install && bin/bash /root (2) NOTWORKINGYET")
-			fmt.Println("go install && wails init && bin/bash /root (3) NOTWORKINGYET")
-			scanner.Scan()
-			text := scanner.Text()
-			switch text {
-			case "1":
-				goInstallWailsInit(distro, git, branch)
-			case "2":
-				//goInstallBashRoot()
-			case "3":
-				//goInstallBoth()
+			for _, distro := range distros {
+				cliMultiChoiceList = append(cliMultiChoiceList, distro)
 			}
 
-			// when finished return for user input
-			fmt.Println("finished doing stuff!")
-			fmt.Println("enter new command:")
-			scanner.Scan()
-			text = scanner.Text()
-			input = text
-
-		case "supported-distros", "7":
-			cmd := "cd ./supported-distros && ls"
-			out, err := exec.Command("bash", "-c", cmd).Output()
-			if err != nil {
-				fmt.Sprintf("failed to execute command: %s", cmd)
+			choice := c.MultiChoice(cliMultiChoiceList, "Choose a distro")
+			var distro string
+			for {
+				switch choice {
+				case 0:
+					distro = "alpine310"
+				case 1:
+					distro = "archlinux"
+				case 2:
+					distro = "centos7"
+				case 3:
+					distro = "debian9"
+				case 4:
+					distro = "fedora30"
+				case 5:
+					distro = "parrot47"
+				case 6:
+					distro = "ubuntu1804"
+				}
+				break
 			}
-			fmt.Printf("%s\n", out)
 
-			scanner.Scan()
-			text := scanner.Text()
-			input = text
+			c.ShowPrompt(false)
+			defer c.ShowPrompt(true)
 
-			// exit
-		case "exit", "0":
-			fmt.Println("testing is over")
-			fmt.Println("hopefully everything works :+1: :+1:")
-			fmt.Println("see u soon!")
-			break loop
+			c.Println("Enter Git and Branch")
+			// prompt for input
+			c.Print("Git repo: ")
+			git := c.ReadLine()
+			c.Print("Branch: ")
+			branch := c.ReadLine()
 
-		case "help", "9":
-			fmt.Println("wails-linux-scripts v0.1-alpha helpfile!")
-			fmt.Println("available commands:")
-			fmt.Println(" * test-branch $distro $git $branch (1) distribution, git repo and specific branch to test against")
-			fmt.Println(" * test-all (2) test (go install & wails init) of given git & branch against all supported distros (cpu intense!) NOTWORKINGYET")
-			fmt.Println(" * supported-distros (7) show all currently support distributions")
-			fmt.Println(" * tester-prune (8) delete from host all wails built docker images")
-			fmt.Println(" * exit (0) exit the tester")
-			fmt.Println(" * help (9) (meta)")
+			choice = c.MultiChoice([]string{
+				"go install && wails init",
+				"go install && bin/bash /root -- NOTWORKINGYET",
+				"go install && wails init && bin/bash /root -- NOTWORKINGYET",
+			}, "Choose a build/test option")
+			var option string
+			for {
+				switch choice {
+				case 0:
+					option = "wailsinit"
+				case 1:
+					option = "binbash"
+				case 2:
+					option = "wailsinitbinbash"
+				}
+				break
+			}
 
-			scanner.Scan()
-			text := scanner.Text()
-			//cmd := strings.TrimSuffix(text, "\n")
-			input = text
+			goInstallWails(distro, git, branch, option)
+		},
+	})
 
-		}
+	shell.AddCmd(&ishell.Cmd{
+		Name:    "prune",
+		Aliases: []string{"3"},
+		Help:    "delete wails built docker images from host (not the distro builds)",
+		Func: func(c *ishell.Context) {
+			c.Println("deleting images..")
+			dockerImagesPrune()
+		},
+	})
+
+	// when started with "exit" as first argument, assume non-interactive execution
+	if len(os.Args) > 1 && os.Args[1] == "exit" {
+		shell.Process(os.Args[2:]...)
+	} else {
+		// start shell
+		shell.Run()
+		// teardown
+		shell.Close()
 	}
+
+	// loop:
+	// 	for {
+	// 		switch input {
+	// 		// when user enters a value not declared in any 'case'
+	// 		// app hangs. 'default' catches this and gracefully
+	// 		// returns some help and puts user back in the 'for' loop
+	// 		default:
+	// 			fmt.Println("command does not exist!")
+	// 			fmt.Println("if you need it type 'help'")
+	// 			scanner.Scan()
+	// 			text := scanner.Text()
+	// 			input = text
+	//
+	// 		case "test-branch", "1":
+	// 			// show a list of all supported-distros
+	// 			// because probably you don't remember it
+	// 			cmd := "cd ./supported-distros && ls"
+	// 			out, err := exec.Command("bash", "-c", cmd).Output()
+	// 			if err != nil {
+	// 				fmt.Sprintf("failed to execute command: %s", cmd)
+	// 			}
+	// 			fmt.Printf("%s", out)
+	//
+	// 			fmt.Printf(" - enter: 'distro git branch'\n")
+	// 			// TODO: code cleanup
+	// 			scanner.Scan()
+	// 			distro := scanner.Text()
+	// 			scanner.Scan()
+	// 			git := scanner.Text()
+	// 			scanner.Scan()
+	// 			branch := scanner.Text()
+	// 			//fmt.Printf("%s %s %s\n", distro, git, branch)
+	//
+	// 			fmt.Println("go install && wails init (1)")
+	// 			// TODO: fix the NOTWORKINGYET
+	// 			fmt.Println("go install && bin/bash /root (2) NOTWORKINGYET")
+	// 			fmt.Println("go install && wails init && bin/bash /root (3) NOTWORKINGYET")
+	// 			scanner.Scan()
+	// 			text := scanner.Text()
+	// 			switch text {
+	// 			case "1":
+	// 				goInstallWailsInit(distro, git, branch)
+	// 			case "2":
+	// 				//goInstallBashRoot()
+	// 			case "3":
+	// 				//goInstallBoth()
+	// 			}
+	//
+	// 			// when finished return for user input
+	// 			fmt.Println("finished doing stuff!")
+	// 			fmt.Println("enter new command:")
+	// 			scanner.Scan()
+	// 			text = scanner.Text()
+	// 			input = text
+	//
+	// 		case "supported-distros", "7":
+	// 			cmd := "cd ./supported-distros && ls"
+	// 			out, err := exec.Command("bash", "-c", cmd).Output()
+	// 			if err != nil {
+	// 				fmt.Sprintf("failed to execute command: %s", cmd)
+	// 			}
+	// 			fmt.Printf("%s\n", out)
+	//
+	// 			scanner.Scan()
+	// 			text := scanner.Text()
+	// 			input = text
+	//
+	// 			// exit
+	// 		case "exit", "0":
+	// 			fmt.Println("testing is over")
+	// 			fmt.Println("hopefully everything works :+1: :+1:")
+	// 			fmt.Println("see u soon!")
+	// 			break loop
+	//
+	// 		case "help", "9":
+	// 			fmt.Println("wails-linux-scripts v0.1-alpha helpfile!")
+	// 			fmt.Println("available commands:")
+	// 			fmt.Println(" * test-branch $distro $git $branch (1) distribution, git repo and specific branch to test against")
+	// 			fmt.Println(" * test-all (2) test (go install & wails init) of given git & branch against all supported distros (cpu intense!) NOTWORKINGYET")
+	// 			fmt.Println(" * supported-distros (7) show all currently support distributions")
+	// 			fmt.Println(" * tester-prune (8) delete from host all wails built docker images")
+	// 			fmt.Println(" * exit (0) exit the tester")
+	// 			fmt.Println(" * help (9) (meta)")
+	//
+	// 			scanner.Scan()
+	// 			text := scanner.Text()
+	// 			//cmd := strings.TrimSuffix(text, "\n")
+	// 			input = text
+	//
+	// 		}
+	// 	}
+	//
 }
 
-func goInstallWailsInit(distro, git, branch string) {
+func goInstallWails(distro, git, branch string, option string) {
 	// check the image of selected distro exists
 	// if not use Dockerfile to build it
 	feedback := checkDockerImageExist(distro)
-	fmt.Println(feedback)
+	log.Println(feedback)
 
 	// build 'git-branch' container to produce the test build
 
@@ -197,9 +296,9 @@ func checkDockerImageExist(distro string) string {
 	cmd := "docker images | grep -c wails-" + distro
 	out, _ := exec.Command("bash", "-c", cmd).Output()
 	string := string(out[:])
-	fmt.Printf("checking if %s is on host", distro)
+	fmt.Printf("checking if %s is on host\n", distro)
 	if string == "0\n" {
-		fmt.Printf("image for %s doesn't exist, building now, this will take a while", distro)
+		fmt.Printf("image for %s doesn't exist, building now, this will take a while\n", distro)
 		cmd := "cd supported-distros/" + distro + " && docker build -t wails-" + distro + " ."
 		out := exec.Command("bash", "-c", cmd)
 		out.Stdin = os.Stdin
@@ -255,6 +354,35 @@ func wailsInit(distro string) {
 	c.SendLine("test")
 	time.Sleep(time.Second)
 	c.SendLine("3")
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func dockerImagesPrune() {
+	c, err := expect.NewConsole(expect.WithStdout(os.Stdout))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer c.Close()
+	label := "label=wails=remove"
+	cmd := exec.Command("docker", "image", "prune", "-a", "--filter", label)
+	cmd.Stdin = c.Tty()
+	cmd.Stdout = c.Tty()
+	cmd.Stderr = c.Tty()
+
+	go func() {
+		c.ExpectEOF()
+	}()
+
+	err = cmd.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+	time.Sleep(time.Second)
+	c.SendLine("y")
 
 	err = cmd.Wait()
 	if err != nil {

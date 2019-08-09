@@ -1,4 +1,5 @@
 FROM centos:7
+LABEL wails="removeall" maintainer="ktc@protonmail.com"
 
 RUN yum -y update && \
  yum -y install curl wget  gcc gcc-c++ make pkgconf-pkg-config nodejs npm gtk3-devel webkitgtk3-devel && \

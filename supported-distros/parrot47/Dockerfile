@@ -1,4 +1,5 @@
 FROM parrotsec/parrot-core
+LABEL wails="removeall" maintainer="ktc@protonmail.com"
 
 RUN apt-get update && \
  apt-get install -y git curl wget libgtk-3-dev libwebkit2gtk-4.0-dev build-essential npm nodejs && \

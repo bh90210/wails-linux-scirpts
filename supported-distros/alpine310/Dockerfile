@@ -1,7 +1,8 @@
-FROM ubuntu:18.04
+FROM alpine:3.10
 LABEL wails="removeall" maintainer="ktc@protonmail.com"
 
-RUN apt-get update && \
- apt-get install -y git curl wget libgtk-3-dev libwebkit2gtk-4.0-dev build-essential npm nodejs && \
+RUN apk update && \
+apk add gtk+3.0 wget git webkit2gtk-dev npm build-base && \
  wget https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz && \
- rm -rf /var/lib/apt/lists/*
+  && \
+apk -v cache clean

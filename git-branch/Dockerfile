@@ -1,4 +1,5 @@
 FROM golang:1.12
+LABEL wails="remove"
 ARG BRANCH
 ARG GIT
 WORKDIR /
