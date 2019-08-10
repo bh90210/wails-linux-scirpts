@@ -14,7 +14,7 @@ a small go script for testing specific wails branches against supported Linux di
 
 ```bash
 . go run .
-├── * `branch` it will promprt for distribution, git repo and specific branch to test against
+├── * `branch` it will prompt for distribution, git repo and specific branch to test against
 │   ├── `go install && wails init`
 │   ├── `go install && bin/bash /root`
 │   └── `go install && wails init && bin/bash /root`
