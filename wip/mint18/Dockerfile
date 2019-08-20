@@ -1,1 +1,1 @@
-FROM vcatechnology/linux-mint
+FROM linuxmintd/mint18-amd64

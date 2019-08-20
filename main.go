@@ -58,6 +58,8 @@ func shell() {
 			choice := c.MultiChoice(cliMultiChoiceList, "Choose a distro")
 			var distro string
 			for {
+				// for each new distro we support, and a dockerfile exist
+				// we should make an entry here as well
 				switch choice {
 				case 0:
 					distro = "alpine310"
@@ -68,10 +70,16 @@ func shell() {
 				case 3:
 					distro = "debian9"
 				case 4:
-					distro = "fedora30"
+					distro = "elementary5"
 				case 5:
-					distro = "parrot47"
+					distro = "fedora30"
 				case 6:
+					distro = "mint19"
+				case 7:
+					distro = "opensuse151leap"
+				case 8:
+					distro = "parrot47"
+				case 9:
 					distro = "ubuntu1804"
 				}
 				break
