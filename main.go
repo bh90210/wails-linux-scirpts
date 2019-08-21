@@ -76,7 +76,7 @@ func shell() {
 				case 6:
 					distro = "mint19"
 				case 7:
-					distro = "opensuse151leap"
+					distro = "opensusetumbleweed"
 				case 8:
 					distro = "parrot47"
 				case 9:
