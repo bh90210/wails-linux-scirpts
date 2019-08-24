@@ -81,6 +81,10 @@ func shell() {
 					distro = "parrot47"
 				case 9:
 					distro = "ubuntu1804"
+				case 10:
+					distro = "voidlinux"
+				case 11:
+					distro = "voidlinux-musl"
 				}
 				break
 			}
