@@ -1,5 +1,7 @@
 FROM voidlinux/voidlinux:latest
 LABEL wails="removeall" maintainer="ktc@protonmail.com"
 
-RUN xbps-install -Sy git curl wget base-devel pkg-config nodejs gtk+3-devel webkit2gtk-devel && \
- wget https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
+RUN xbps-install -Syu
+RUN xbps-install -yu
+RUN xbps-install -y go git curl wget base-devel pkg-config nodejs gtk+3-devel webkit2gtk-devel
+ENTRYPOINT ["/bin/sh"]

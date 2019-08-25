@@ -102,7 +102,7 @@ func shell() {
 			choice = c.MultiChoice([]string{
 				"go install && wails init",
 				"go install && bin/bash /root -- NOTWORKINGYET",
-				"go install && wails init && bin/bash /root -- NOTWORKINGYET",
+				"go install && wails setup && bin/bash /root -- NOTWORKINGYET",
 			}, "Choose a build/test option")
 			var option string
 			for {
@@ -357,6 +357,7 @@ func wailsInit(distro string) {
 	time.Sleep(time.Second)
 	c.SendLine("test@test.test")
 
+	time.Sleep(time.Second * 4)
 	c.SendLine("wails init")
 	time.Sleep(time.Second * 2)
 	c.SendLine("test")
